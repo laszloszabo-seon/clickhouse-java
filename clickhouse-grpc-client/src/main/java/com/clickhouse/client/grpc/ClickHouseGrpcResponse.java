@@ -28,7 +28,7 @@ public class ClickHouseGrpcResponse extends ClickHouseStreamResponse {
 
     protected ClickHouseGrpcResponse(ClickHouseConfig config, Map<String, Serializable> settings,
             ClickHouseStreamObserver observer) throws IOException {
-        super(config, observer.getInputStream(), settings, null, observer.getSummary());
+        super(config, observer.getInputStream(), settings, null, observer.getSummary(), observer.getQueryId());
 
         this.observer = observer;
     }
@@ -42,7 +42,7 @@ public class ClickHouseGrpcResponse extends ClickHouseStreamResponse {
                         : ClickHouseGrpcClientImpl.getInput(config, result.getOutput().newInput(),
                                 () -> checkError(result)),
                 settings, null,
-                new ClickHouseResponseSummary(null, null));
+                new ClickHouseResponseSummary(null, null), result.getQueryId());
 
         this.observer = null;
         if (result.hasProgress()) {

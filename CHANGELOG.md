@@ -1,5 +1,8 @@
 ## Latest 
 
+### New Features
+- Added possibility to get request ID from ClickHouseResponse
+
 ## 0.6.0-patch4
 
 ### New Features

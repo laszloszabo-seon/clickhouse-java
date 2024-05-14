@@ -28,7 +28,7 @@ public class ClickHouseSimpleResponse implements ClickHouseResponse {
      * @return response object
      */
     public static ClickHouseResponse of(ClickHouseConfig config, List<ClickHouseColumn> columns, Object[][] values) {
-        return of(config, columns, values, null);
+        return of(config, columns, values, null, null);
     }
 
     /**
@@ -41,7 +41,7 @@ public class ClickHouseSimpleResponse implements ClickHouseResponse {
      * @return response object
      */
     public static ClickHouseResponse of(ClickHouseConfig config, List<ClickHouseColumn> columns, Object[][] values,
-            ClickHouseResponseSummary summary) {
+            ClickHouseResponseSummary summary, String queryId) {
         if (columns == null) {
             columns = Collections.emptyList();
         }
@@ -69,7 +69,7 @@ public class ClickHouseSimpleResponse implements ClickHouseResponse {
             }
         }
 
-        return new ClickHouseSimpleResponse(columns, wrappedValues, summary);
+        return new ClickHouseSimpleResponse(columns, wrappedValues, summary, queryId);
     }
 
     /**
@@ -118,25 +118,27 @@ public class ClickHouseSimpleResponse implements ClickHouseResponse {
             records.add(rec);
         }
 
-        return new ClickHouseSimpleResponse(response.getColumns(), records, response.getSummary());
+        return new ClickHouseSimpleResponse(response.getColumns(), records, response.getSummary(), response.getQueryId());
     }
 
     private final List<ClickHouseColumn> columns;
     // better to use simple ClickHouseRecord as template along with raw values
     private final List<ClickHouseRecord> records;
     private final ClickHouseResponseSummary summary;
+    private final String queryId;
 
     private volatile boolean closed;
 
     protected ClickHouseSimpleResponse(List<ClickHouseColumn> columns, List<ClickHouseRecord> records,
-            ClickHouseResponseSummary summary) {
+            ClickHouseResponseSummary summary, String queryId) {
         this.columns = columns;
         this.records = Collections.unmodifiableList(records);
         this.summary = summary != null ? summary : ClickHouseResponseSummary.EMPTY;
+        this.queryId = queryId != null ? queryId : "";
     }
 
     protected ClickHouseSimpleResponse(List<ClickHouseColumn> columns, ClickHouseValue[][] values,
-            ClickHouseResponseSummary summary) {
+            ClickHouseResponseSummary summary, String queryId) {
         this.columns = columns;
 
         int len = values.length;
@@ -148,6 +150,7 @@ public class ClickHouseSimpleResponse implements ClickHouseResponse {
         this.records = Collections.unmodifiableList(list);
 
         this.summary = summary != null ? summary : ClickHouseResponseSummary.EMPTY;
+        this.queryId = queryId != null ? queryId : "";
     }
 
     @Override
@@ -189,5 +192,10 @@ public class ClickHouseSimpleResponse implements ClickHouseResponse {
     @Override
     public boolean isClosed() {
         return closed;
+    }
+
+    @Override
+    public String getQueryId() {
+        return queryId;
     }
 }

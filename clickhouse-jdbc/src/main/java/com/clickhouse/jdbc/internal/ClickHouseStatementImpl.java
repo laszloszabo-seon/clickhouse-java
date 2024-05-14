@@ -231,7 +231,7 @@ public class ClickHouseStatementImpl extends JdbcWrapper
                         new Object[][] { { file, f.getFormat().name(),
                                 f.hasCompression() ? f.getCompressionAlgorithm().encoding() : "none",
                                 f.getCompressionLevel(), f.getFile().length() } },
-                        summary);
+                        summary, queryId);
             } else if (stmt.getStatementType() == StatementType.INSERT) {
                 final Mutation m = request.write().query(stmt.getSQL());
                 final ClickHouseResponseSummary summary = new ClickHouseResponseSummary(null, null);
@@ -262,7 +262,7 @@ public class ClickHouseStatementImpl extends JdbcWrapper
                 } catch (IOException e) {
                     throw SqlExceptionUtils.handle(e);
                 }
-                return ClickHouseSimpleResponse.of(null, null, new Object[0][], summary);
+                return ClickHouseSimpleResponse.of(null, null, new Object[0][], summary, queryId);
             }
         }
 

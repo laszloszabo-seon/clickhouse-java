@@ -42,6 +42,8 @@ public class ClickHouseStreamObserver implements StreamObserver<Result> {
 
     private final ClickHouseResponseSummary summary;
 
+    private final AtomicReference<String> queryIdRef;
+
     private final AtomicReference<IOException> errorRef;
 
     protected ClickHouseStreamObserver(ClickHouseConfig config, ClickHouseNode server, ClickHouseOutputStream output) {
@@ -69,6 +71,7 @@ public class ClickHouseStreamObserver implements StreamObserver<Result> {
         }
 
         this.summary = new ClickHouseResponseSummary(null, null);
+        this.queryIdRef = new AtomicReference<>(null);
 
         this.errorRef = new AtomicReference<>(null);
     }
@@ -81,6 +84,7 @@ public class ClickHouseStreamObserver implements StreamObserver<Result> {
 
     protected boolean updateStatus(Result result) {
         summary.update();
+        queryIdRef.set(result.getQueryId());
 
         if (log.isDebugEnabled()) {
             log.debug(() -> {
@@ -141,6 +145,10 @@ public class ClickHouseStreamObserver implements StreamObserver<Result> {
 
     public ClickHouseResponseSummary getSummary() {
         return summary;
+    }
+
+    public String getQueryId() {
+        return queryIdRef.get();
     }
 
     public IOException getError() {

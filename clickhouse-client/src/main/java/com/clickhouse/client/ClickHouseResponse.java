@@ -75,6 +75,11 @@ public interface ClickHouseResponse extends AutoCloseable, Serializable {
             // ensure the instance is "stateless"
             return false;
         }
+
+        @Override
+        public String getQueryId() {
+            return "";
+        }
     };
 
     /**
@@ -196,4 +201,11 @@ public interface ClickHouseResponse extends AutoCloseable, Serializable {
      * @return true if the response has been closed; false otherwise
      */
     boolean isClosed();
+
+    /**
+     * Gets the query id.
+     *
+     * @return query id or empty string if not available.
+     */
+    String getQueryId();
 }

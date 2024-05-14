@@ -27,38 +27,41 @@ public class ClickHouseStreamResponse implements ClickHouseResponse {
             .singletonList(ClickHouseColumn.of("results", "Nullable(String)"));
 
     public static ClickHouseResponse of(ClickHouseConfig config, ClickHouseInputStream input) throws IOException {
-        return of(config, input, null, null, null);
+        return of(config, input, null, null, null, null);
     }
 
     public static ClickHouseResponse of(ClickHouseConfig config, ClickHouseInputStream input,
             Map<String, Serializable> settings) throws IOException {
-        return of(config, input, settings, null, null);
+        return of(config, input, settings, null, null, null);
     }
 
     public static ClickHouseResponse of(ClickHouseConfig config, ClickHouseInputStream input,
             List<ClickHouseColumn> columns) throws IOException {
-        return of(config, input, null, columns, null);
+        return of(config, input, null, columns, null, null);
     }
 
     public static ClickHouseResponse of(ClickHouseConfig config, ClickHouseInputStream input,
             Map<String, Serializable> settings, List<ClickHouseColumn> columns) throws IOException {
-        return of(config, input, settings, columns, null);
+        return of(config, input, settings, columns, null, null);
     }
 
     public static ClickHouseResponse of(ClickHouseConfig config, ClickHouseInputStream input,
-            Map<String, Serializable> settings, List<ClickHouseColumn> columns, ClickHouseResponseSummary summary)
+            Map<String, Serializable> settings, List<ClickHouseColumn> columns, ClickHouseResponseSummary summary,
+            String queryId)
             throws IOException {
-        return new ClickHouseStreamResponse(config, input, settings, columns, summary);
+        return new ClickHouseStreamResponse(config, input, settings, columns, summary, queryId);
     }
 
     protected final ClickHouseConfig config;
     protected final transient ClickHouseDataProcessor processor;
     protected final ClickHouseResponseSummary summary;
+    protected final String queryId;
 
     private volatile boolean closed;
 
     protected ClickHouseStreamResponse(ClickHouseConfig config, ClickHouseInputStream input,
-            Map<String, Serializable> settings, List<ClickHouseColumn> columns, ClickHouseResponseSummary summary)
+            Map<String, Serializable> settings, List<ClickHouseColumn> columns, ClickHouseResponseSummary summary,
+            String queryId)
             throws IOException {
 
         boolean hasError = true;
@@ -82,11 +85,17 @@ public class ClickHouseStreamResponse implements ClickHouseResponse {
 
         this.closed = hasError;
         this.summary = summary != null ? summary : ClickHouseResponseSummary.EMPTY;
+        this.queryId = queryId != null ? queryId : "";
     }
 
     @Override
     public boolean isClosed() {
         return closed;
+    }
+
+    @Override
+    public String getQueryId() {
+        return queryId;
     }
 
     @Override

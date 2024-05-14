@@ -1842,10 +1842,18 @@ public abstract class ClientIntegrationTest extends BaseIntegrationTest {
             int result1 = 1;
             int result2 = 2;
             ClickHouseResponse queryResp = req.copy().query("select 1").executeAndWait();
+            String queryId1 = queryResp.getQueryId();
+            Assert.assertNotNull(queryId1);
+            Assert.assertNotEquals(queryId1, "");
+            String queryId2;
 
             try (ClickHouseResponse resp = req.copy().query("select 2").executeAndWait()) {
                 Assert.assertEquals(resp.firstRecord().getValue(0).asInteger(), result2);
+                queryId2 = resp.getQueryId();
+                Assert.assertNotNull(queryId2);
+                Assert.assertNotEquals(queryId2, "");
             }
+            Assert.assertNotEquals(queryId1, queryId2);
 
             result2 = 0;
             for (ClickHouseRecord r : queryResp.records()) {
